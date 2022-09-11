@@ -1,27 +1,52 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'extensions.dart';
+import 'package:learning_ui/screens/leaderboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:learning_ui/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
-import 'theme.dart';
+import 'package:learning_ui/utils/theme.dart';
 import 'package:provider/provider.dart';
+import 'package:learning_ui/utils/db.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+int oScore = 0;
+int xScore = 0;
+
+class GameScreen extends StatefulWidget {
+  const GameScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<GameScreen> createState() => _GameScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _GameScreenState extends State<GameScreen> {
   bool oTurn = true;
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
 
   // 1st player is O
   List<String> displayElement = ['', '', '', '', '', '', '', '', ''];
-  int oScore = 0;
-  int xScore = 0;
+
   int filledBoxes = 0;
+
+  String playerX = '';
+  String playerO = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlayerNames();
+    _storePlayerNamesToDB();
+  }
+
+  _storePlayerNamesToDB() async {
+    var existingPlayers = await SqliteService().getLeaders();
+    existingPlayers.any((element) => element.values.contains(playerX)) == false
+        ? SqliteService().insertPlayer(playerX, 0)
+        : null;
+    existingPlayers.any((element) => element.values.contains(playerO)) == false
+        ? SqliteService().insertPlayer(playerO, 0)
+        : null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,9 +101,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   ListTile(
-                    leading: const Icon(Icons.leaderboard),
+                    leading: const Icon(Icons.rule),
                     title: Text(
-                      'Leader Board',
+                      'Rules',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: Theme.of(context).colorScheme.secondary,
                           ),
@@ -128,9 +153,9 @@ class _HomePageState extends State<HomePage> {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 3.w, vertical: 3.h),
+                            horizontal: 3.w, vertical: 2.h),
                         child: Container(
-                          width: 30.w,
+                          width: 40.w,
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.primary,
                             borderRadius:
@@ -141,7 +166,19 @@ class _HomePageState extends State<HomePage> {
                             children: <Widget>[
                               Text(
                                 'Player X',
-                                style: context.titleMedium!.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              Text(
+                                playerX.toUpperCase(),
+                                style: context.titleSmall!.copyWith(
                                   color:
                                       Theme.of(context).colorScheme.onPrimary,
                                 ),
@@ -152,7 +189,6 @@ class _HomePageState extends State<HomePage> {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .secondaryContainer,
-                                  fontSize: 20,
                                 ),
                               ),
                             ],
@@ -161,9 +197,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 3.w, vertical: 3.h),
+                            horizontal: 3.w, vertical: 2.h),
                         child: Container(
-                          width: 30.w,
+                          width: 40.w,
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.primary,
                             borderRadius:
@@ -174,7 +210,19 @@ class _HomePageState extends State<HomePage> {
                             children: <Widget>[
                               Text(
                                 'Player O',
-                                style: context.titleMedium!.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              Text(
+                                playerO.toUpperCase(),
+                                style: context.titleSmall!.copyWith(
                                   color:
                                       Theme.of(context).colorScheme.onPrimary,
                                 ),
@@ -185,7 +233,6 @@ class _HomePageState extends State<HomePage> {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .secondaryContainer,
-                                  fontSize: 20,
                                 ),
                               ),
                             ],
@@ -210,7 +257,13 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (BuildContext context, int index) {
                       return GestureDetector(
                         onTap: () {
-                          _tapped(index);
+                          var playerName = '';
+                          if (oTurn) {
+                            playerName = playerO;
+                          } else {
+                            playerName = playerX;
+                          }
+                          _tapped(index, playerName);
                         },
                         child: Container(
                           width: 100.w,
@@ -258,26 +311,56 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Expanded(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    ElevatedButton(
-                      onPressed: _clearScoreBoard,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onTertiaryContainer,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.tertiaryContainer,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 3.w, vertical: 2.h),
+                        child: ElevatedButton(
+                          onPressed: _clearBoard,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Theme.of(context)
+                                .colorScheme
+                                .onTertiaryContainer,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.tertiaryContainer,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                            ),
+                            shadowColor: Theme.of(context)
+                                .colorScheme
+                                .onTertiaryContainer,
+                          ),
+                          child: const Text("Clear XO Board"),
                         ),
-                        shadowColor:
-                            Theme.of(context).colorScheme.onTertiaryContainer,
                       ),
-                      child: const Text("Clear Score Board"),
-                    ),
-                  ],
-                )),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 3.w, vertical: 2.h),
+                        child: ElevatedButton(
+                          onPressed: _clearScoreBoard,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Theme.of(context)
+                                .colorScheme
+                                .onTertiaryContainer,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.tertiaryContainer,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                            ),
+                            shadowColor: Theme.of(context)
+                                .colorScheme
+                                .onTertiaryContainer,
+                          ),
+                          child: const Text("Clear Score Board"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -302,7 +385,27 @@ class _HomePageState extends State<HomePage> {
               ],
               currentIndex: _selectedIndex,
               selectedItemColor: Theme.of(context).colorScheme.primary,
-              onTap: _onItemTapped,
+              onTap: (index) {
+                if (index == 0) {
+                  Scores().loadScores().then((value) {
+                    xScore = value[0];
+                    oScore = value[1];
+                  });
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const GameScreen(),
+                    ),
+                  );
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LeaderBoard(),
+                    ),
+                  );
+                }
+              },
             ),
           ),
         );
@@ -310,76 +413,78 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _onItemTapped(int index) {
+  Future<void> _loadPlayerNames() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _selectedIndex = index;
+      playerX = prefs.getString('playerX') ?? 'Player X';
+      playerO = prefs.getString('playerO') ?? 'Player O';
     });
   }
 
-  void _tapped(int index) {
+  void _tapped(int index, String playerName) {
     setState(() {
       if (oTurn && displayElement[index] == '') {
         // debugPrint('Player O turn');
         displayElement[index] = 'O';
         filledBoxes++;
+        _checkWinner(playerName);
         oTurn = false;
       } else if (!oTurn && displayElement[index] == '') {
         // debugPrint('Player X turn');
         displayElement[index] = 'X';
         filledBoxes++;
+        _checkWinner(playerName);
         oTurn = true;
       }
-      // debugPrint(filledBoxes.toString());
-      _checkWinner();
     });
   }
 
-  void _checkWinner() {
+  void _checkWinner(String playerName) {
     // debugPrint('Checking for winner');
     // Checking rows
     if (displayElement[0] == displayElement[1] &&
         displayElement[0] == displayElement[2] &&
         displayElement[0] != '') {
-      _showWinDialog(displayElement[0]);
+      _showWinDialog(playerName);
     }
     if (displayElement[3] == displayElement[4] &&
         displayElement[3] == displayElement[5] &&
         displayElement[3] != '') {
-      _showWinDialog(displayElement[3]);
+      _showWinDialog(playerName);
     }
     if (displayElement[6] == displayElement[7] &&
         displayElement[6] == displayElement[8] &&
         displayElement[6] != '') {
-      _showWinDialog(displayElement[6]);
+      _showWinDialog(playerName);
     }
 
     // Checking Column
     if (displayElement[0] == displayElement[3] &&
         displayElement[0] == displayElement[6] &&
         displayElement[0] != '') {
-      _showWinDialog(displayElement[0]);
+      _showWinDialog(playerName);
     }
     if (displayElement[1] == displayElement[4] &&
         displayElement[1] == displayElement[7] &&
         displayElement[1] != '') {
-      _showWinDialog(displayElement[1]);
+      _showWinDialog(playerName);
     }
     if (displayElement[2] == displayElement[5] &&
         displayElement[2] == displayElement[8] &&
         displayElement[2] != '') {
-      _showWinDialog(displayElement[2]);
+      _showWinDialog(playerName);
     }
 
     // Checking Diagonal
     if (displayElement[0] == displayElement[4] &&
         displayElement[0] == displayElement[8] &&
         displayElement[0] != '') {
-      _showWinDialog(displayElement[0]);
+      _showWinDialog(playerName);
     }
     if (displayElement[2] == displayElement[4] &&
         displayElement[2] == displayElement[6] &&
         displayElement[2] != '') {
-      _showWinDialog(displayElement[2]);
+      _showWinDialog(playerName);
     } else if (filledBoxes == 9) {
       _showDrawDialog();
     }
@@ -391,7 +496,7 @@ class _HomePageState extends State<HomePage> {
       dialogType: DialogType.success,
       animType: AnimType.bottomSlide,
       title: 'Winner',
-      desc: '$winner won the game',
+      desc: '${winner.toUpperCase()} won the game',
       btnOkOnPress: () => _clearBoard(),
       onDismissCallback: (DismissType dismissType) {
         debugPrint('Dialog Dismiss from callback $dismissType');
@@ -402,17 +507,25 @@ class _HomePageState extends State<HomePage> {
       dialogBackgroundColor: Theme.of(context).colorScheme.secondaryContainer,
     ).show();
 
-    if (winner == 'O') {
+    if (winner == playerO) {
       debugPrint("O is Winner");
       setState(() {
-        oScore++;
+        oScore = oScore + 10;
+        debugPrint("O Score is $oScore");
       });
-    } else if (winner == 'X') {
+    } else if (winner == playerX) {
       debugPrint("X is Winner");
       setState(() {
-        xScore++;
+        xScore = xScore + 10;
+        debugPrint("X Score is $xScore");
       });
     }
+
+    // Save score to shared preferences
+    Scores().saveScores(xScore, oScore);
+
+    //  Update Db
+    SqliteService().updateLeader(winner, 10);
   }
 
   void _showDrawDialog() {
@@ -433,6 +546,18 @@ class _HomePageState extends State<HomePage> {
           TextStyle(color: Theme.of(context).colorScheme.onSecondaryContainer),
       dialogBackgroundColor: Theme.of(context).colorScheme.secondaryContainer,
     ).show();
+
+    setState(() {
+      xScore = xScore + 5;
+      oScore = oScore + 5;
+    });
+
+    // Save score to shared preferences
+    Scores().saveScores(xScore, oScore);
+
+    //  Update Db
+    SqliteService().updateLeader(playerX, 5);
+    SqliteService().updateLeader(playerO, 5);
   }
 
   void _clearBoard() {
@@ -446,6 +571,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _clearScoreBoard() {
+    Scores().resetScores();
     setState(() {
       xScore = 0;
       oScore = 0;

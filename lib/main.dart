@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'theme.dart';
+import 'package:learning_ui/screens/players.dart';
+import 'package:learning_ui/utils/db.dart';
+import 'package:learning_ui/utils/theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SqliteService().initializeDB();
+  await SharedPreferences.getInstance();
+
   runApp(const MyApp());
 }
 
@@ -26,7 +32,7 @@ class MyApp extends StatelessWidget {
                 theme: themeNotifier.isDarkMode
                     ? Themes.darkTheme
                     : Themes.lightTheme,
-                home: const HomePage(),
+                home: const PlayerName(),
               );
             },
           );
@@ -35,9 +41,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// TODO: Landing Page to start the game after entering the name of the players
-// TODO: Capture the name of Payer 1 and Player 2
-// TODO: Display the name of the players on the game screen
-// TODO: Save the score of the players in the database after a win
-// TODO: Leader Board to display the name of the players and their scores
