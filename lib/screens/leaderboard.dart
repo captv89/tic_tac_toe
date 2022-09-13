@@ -1,9 +1,9 @@
 // Leader Board Screen to show the players and their scores
 
 import 'package:flutter/material.dart';
-import 'package:learning_ui/screens/game.dart';
 import 'package:learning_ui/utils/db.dart';
 import 'package:learning_ui/utils/theme.dart';
+import 'package:learning_ui/utils/extensions.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -22,8 +22,6 @@ class LeaderBoard extends StatefulWidget {
 }
 
 class LeaderBoardState extends State<LeaderBoard> {
-  final int _selectedIndex = 1;
-
   @override
   void initState() {
     super.initState();
@@ -35,7 +33,13 @@ class LeaderBoardState extends State<LeaderBoard> {
     return Consumer(builder: (context, ThemeModel themeNotifier, child) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Tic Tac Toe'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text(
+            'Leader Board',
+            style: context.textTheme.titleLarge?.copyWith(
+              color: Colors.white,
+            ),
+          ),
           actions: [
             IconButton(
               icon: Icon(
@@ -51,124 +55,7 @@ class LeaderBoardState extends State<LeaderBoard> {
             ),
           ],
         ),
-        drawer: SizedBox(
-          width: 60.w,
-          child: Drawer(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                DrawerHeader(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 45, vertical: 55),
-                  curve: Curves.easeIn,
-                  duration: const Duration(seconds: 1),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Theme.of(context).colorScheme.primaryContainer,
-                        Theme.of(context).colorScheme.tertiaryContainer,
-                      ],
-                    ),
-                  ),
-                  child: Text(
-                    'Tic Tac Toe',
-                    style: Theme.of(context).textTheme.headline5?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSecondaryContainer,
-                        ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.leaderboard),
-                  title: Text(
-                    'Leader Board',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                  ),
-                  onTap: () {
-                    // Update the state of the app.
-                    // ...
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.settings),
-                  title: Text(
-                    'Settings',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                  ),
-                  onTap: () {
-                    // Update the state of the app.
-                    // ...
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.info),
-                  title: Text(
-                    'About',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                  ),
-                  onTap: () {
-                    // Update the state of the app.
-                    // ...
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
         body: _buildLeaderBoard(context),
-        bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(
-            canvasColor: Theme.of(context).colorScheme.secondaryContainer,
-            primaryColor: Theme.of(context).colorScheme.onSecondaryContainer,
-            textTheme: Theme.of(context).textTheme.copyWith(
-                  caption: const TextStyle(color: Colors.white),
-                ),
-          ),
-          child: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.leaderboard),
-                label: 'Leaderboard',
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: Theme.of(context).colorScheme.primary,
-            onTap: (index) {
-              if (index == 0) {
-                Scores().loadScores().then((value) {
-                  xScore = value[0];
-                  oScore = value[1];
-                });
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const GameScreen(),
-                  ),
-                );
-              } else {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LeaderBoard(),
-                  ),
-                );
-              }
-            },
-          ),
-        ),
       );
     });
   }
@@ -184,33 +71,27 @@ class LeaderBoardState extends State<LeaderBoard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 height: 10.h,
-                color: Theme.of(context).colorScheme.tertiaryContainer,
+                color: Theme.of(context).colorScheme.primaryContainer,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Rank',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onTertiaryContainer,
-                          ),
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                     Text(
                       'Name',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onTertiaryContainer,
-                          ),
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                     Text(
                       'Score',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onTertiaryContainer,
-                          ),
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ],
                 ),
@@ -226,12 +107,11 @@ class LeaderBoardState extends State<LeaderBoard> {
                       child: ListTile(
                         leading: Text(
                           '${index + 1}',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondaryContainer,
-                                  ),
+                          style: context.textTheme.titleMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                          ),
                         ),
                         title: Align(
                           alignment: Alignment.center,
@@ -249,12 +129,11 @@ class LeaderBoardState extends State<LeaderBoard> {
                         ),
                         trailing: Text(
                           leader.score.toString(),
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondaryContainer,
-                                  ),
+                          style: context.textTheme.titleMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                          ),
                         ),
                       ),
                     );

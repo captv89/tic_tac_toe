@@ -1,9 +1,12 @@
 // A widget to capture the player names
 
 import 'package:flutter/material.dart';
+import 'package:learning_ui/utils/extensions.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:learning_ui/screens/game.dart';
+import 'package:learning_ui/utils/theme.dart';
 
 class PlayerName extends StatefulWidget {
   const PlayerName({Key? key}) : super(key: key);
@@ -32,75 +35,99 @@ class PlayerNameState extends State<PlayerName> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome to Tic Tac Toe'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Enter the player names',
-                    style: Theme.of(context).textTheme.headline5,
+    return Consumer(
+      builder: (context, ThemeModel themeNotifier, child) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            title: Text(
+              'Welcome',
+              style: context.textTheme.titleLarge?.copyWith(
+                color: Colors.white,
+              ),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(
+                  themeNotifier.isDarkMode
+                      ? Icons.wb_sunny
+                      : Icons.nightlight_round,
+                ),
+                onPressed: () {
+                  themeNotifier.isDarkMode
+                      ? themeNotifier.isDarkMode = false
+                      : themeNotifier.isDarkMode = true;
+                },
+              ),
+            ],
+          ),
+          body: Form(
+            key: _formKey,
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'Enter the player names',
+                        style: context.textTheme.headline5,
+                      ),
+                      const SizedBox(height: 20.0),
+                      TextFormField(
+                        controller: _player1Controller,
+                        decoration: const InputDecoration(
+                          labelText: 'Player X:',
+                          hintText: 'Enter Player X Nickname',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter Player X Nickname';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: _player2Controller,
+                        decoration: const InputDecoration(
+                          labelText: 'Player O:',
+                          hintText: 'Enter Player O Nickname',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter Player O Nickname';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _savePlayerNames().then((v) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const GameScreen(),
+                                ),
+                              );
+                            });
+                          }
+                        },
+                        child: const Text('Start Game'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: _player1Controller,
-                    decoration: const InputDecoration(
-                      labelText: 'Player X:',
-                      hintText: 'Enter Player X Nickname',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter Player X Nickname';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _player2Controller,
-                    decoration: const InputDecoration(
-                      labelText: 'Player O:',
-                      hintText: 'Enter Player O Nickname',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter Player O Nickname';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _savePlayerNames().then((v) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const GameScreen(),
-                            ),
-                          );
-                        });
-                      }
-                    },
-                    child: const Text('Start Game'),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

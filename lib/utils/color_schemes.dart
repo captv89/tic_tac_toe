@@ -27,7 +27,7 @@ const lightColorScheme = ColorScheme(
   outline: Color(0xFF6F797A),
   onInverseSurface: Color(0xFFEFF1F1),
   inverseSurface: Color(0xFF2E3132),
-  inversePrimary: Color(0xFF4FD8EA),
+  inversePrimary: Color(0xFF214F56),
   shadow: Color(0xFF000000),
   surfaceTint: Color(0xFF006973),
 );
@@ -59,7 +59,7 @@ const darkColorScheme = ColorScheme(
   outline: Color(0xFF899294),
   onInverseSurface: Color(0xFF191C1D),
   inverseSurface: Color(0xFFE1E3E3),
-  inversePrimary: Color(0xFF006973),
+  inversePrimary: Color(0xFF0F3538),
   shadow: Color(0xFF000000),
   surfaceTint: Color(0xFF4FD8EA),
 );
