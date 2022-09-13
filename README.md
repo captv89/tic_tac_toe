@@ -12,13 +12,20 @@ A simple game app developed with flutter. This app was developed to learn the ho
 
 ## Screenshots
 
-![Light Mode](https://i.ibb.co/9pbpRFL/Screenshot-20220913-205625.png "Light Mode" | height= 100)
-![Dark Mode](https://i.ibb.co/sggMsgV/Screenshot-20220913-205526.png)
-![Side Drawer](https://i.ibb.co/fQ8MG6V/Screenshot-20220913-205612.png)
-![Leaderboard](https://i.ibb.co/Xj486V5/Screenshot-20220913-205641.png)
+### Light Mode
+<img src="https://i.ibb.co/9pbpRFL/Screenshot-20220913-205625.png" height="100">
+
+### Dark Mode
+<img src="https://i.ibb.co/sggMsgV/Screenshot-20220913-205526.png" height="100">
+
+### Side Drawer
+<img src="https://i.ibb.co/fQ8MG6V/Screenshot-20220913-205612.png" height="100">
+
+## Leaderboard
+<img src="https://i.ibb.co/Xj486V5/Screenshot-20220913-205641.png" height="100">
+
 
 ## Packages Used
-
 - google_fonts: ^3.0.1
 - shared_preferences: ^2.0.6
 - sizer: ^2.0.15
@@ -32,4 +39,4 @@ A simple game app developed with flutter. This app was developed to learn the ho
 
 
 ## Attributes
-![flaticon](https://www.flaticon.com/free-icons/tic-tac-toe)
+![freepik - flaticon](https://www.flaticon.com/free-icons/tic-tac-toe)
