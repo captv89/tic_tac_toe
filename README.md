@@ -13,16 +13,16 @@ A simple game app developed with flutter. This app was developed to learn the ho
 ## Screenshots
 
 ### Light Mode
-<img src="https://i.ibb.co/9pbpRFL/Screenshot-20220913-205625.png" height="100">
+<img src="https://i.ibb.co/9pbpRFL/Screenshot-20220913-205625.png" height="420">
 
 ### Dark Mode
-<img src="https://i.ibb.co/sggMsgV/Screenshot-20220913-205526.png" height="100">
+<img src="https://i.ibb.co/sggMsgV/Screenshot-20220913-205526.png" height="420">
 
 ### Side Drawer
-<img src="https://i.ibb.co/fQ8MG6V/Screenshot-20220913-205612.png" height="100">
+<img src="https://i.ibb.co/fQ8MG6V/Screenshot-20220913-205612.png" height="420">
 
 ## Leaderboard
-<img src="https://i.ibb.co/Xj486V5/Screenshot-20220913-205641.png" height="100">
+<img src="https://i.ibb.co/Xj486V5/Screenshot-20220913-205641.png" height="420">
 
 
 ## Packages Used
