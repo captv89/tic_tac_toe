@@ -2,7 +2,7 @@
 
 # Tic Tac Toe
 
-A simple game app developed with flutter. This app was developed to learn the how to build UI and persist data with the help of flutter. I have Flutter docs to thank and obviously the flutter community. 
+A simple game app developed with flutter. This app was developed to learn the how to build UI and persist data with the help of flutter. I have Flutter docs to thank and obviously the flutter community.
 
 ## Features
 1. Play with a friend
